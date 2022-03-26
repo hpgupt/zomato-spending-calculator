@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
+import { makeApiCalls } from "./api";
 
 const Popup = () => {
-  const [count, setCount] = useState(0);
   const [currentURL, setCurrentURL] = useState<string>();
-
-  useEffect(() => {
-    chrome.action.setBadgeText({ text: count.toString() });
-  }, [count]);
+  const [isZomatoHomeOpen, setIsZomatoHomeOpen] = useState<boolean>(false);
+  const [isSignedIn, setIsSignedIn] = useState<boolean>(false);
+  const [totalCost, setTotalCost] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
@@ -15,36 +15,55 @@ const Popup = () => {
     });
   }, []);
 
-  const changeBackground = () => {
-    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-      const tab = tabs[0];
-      if (tab.id) {
-        chrome.tabs.sendMessage(
-          tab.id,
-          {
-            color: "#555555",
-          },
-          (msg) => {
-            console.log("result message:", msg);
-          }
-        );
+  useEffect(() => {
+    if (currentURL) {
+      const url = new URL(currentURL);
+      if (url.hostname === "www.zomato.com") {
+        if (url.pathname === "/") {
+          setIsZomatoHomeOpen(true);
+          chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+            const currentTab = tabs[0];
+            if (currentTab.id) {
+              chrome.tabs.sendMessage(currentTab.id, { type: "getAuthStatus" }, (response) => {
+                setIsSignedIn(response.isLoggedIn);
+              });
+              getCookies();
+            }
+
+          });
+        }
       }
+    }
+
+  }, [currentURL]);
+
+  const getCookies = () => {
+    chrome.cookies.getAll({ url: "https://www.zomato.com" }, async (cookies) => {
+      setIsLoading(true);
+      const results = await makeApiCalls(cookies);
+      setTotalCost(results.reduce((acc: number, curr: number) => acc + curr, 0));
+      setIsLoading(false);
     });
-  };
+  }
 
   return (
     <>
-      <ul style={{ minWidth: "700px" }}>
-        <li>Current URL: {currentURL}</li>
-        <li>Current Time: {new Date().toLocaleTimeString()}</li>
-      </ul>
-      <button
-        onClick={() => setCount(count + 1)}
-        style={{ marginRight: "5px" }}
-      >
-        count up
-      </button>
-      <button onClick={changeBackground}>change background</button>
+      <p>Current URL : {currentURL}</p>
+      {isZomatoHomeOpen ? (isSignedIn ? (<div>
+        <h1>Zomato Home is open</h1>
+        <p> SignedIn</p>
+        <p>Total Amount Spent : {isLoading ? "Loading...." : totalCost}</p>
+      </div>) : (
+        <div>
+          <h1>Zomato Home is open</h1>
+          <p>Not signed in</p>
+        </div>)
+      ) : (
+        <div>
+          <h1>Zomato Home is not open</h1>
+          <p> Open www.zomato.com on your browser, then use this extension</p>
+        </div>
+      )}
     </>
   );
 };

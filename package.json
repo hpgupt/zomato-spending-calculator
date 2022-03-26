@@ -1,7 +1,7 @@
 {
-  "name": "chrome-extension-typescript-starter",
+  "name": "zomato-spending-calculator",
   "version": "1.0.0",
-  "description": "chrome-extension-typescript-starter",
+  "description": "View total amount (rupees) you have spent till now while ordering from Zomato App",
   "main": "index.js",
   "scripts": {
     "watch": "webpack --config webpack/webpack.dev.js --watch",
@@ -14,7 +14,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/chibat/chrome-extension-typescript-starter.git"
+    "url": "https://github.com/harshnitk17/zomato-spending-calculator.git"
   },
   "dependencies": {
     "react": "^17.0.1",
