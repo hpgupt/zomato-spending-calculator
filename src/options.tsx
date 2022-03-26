@@ -1,22 +1,18 @@
 import React, { useEffect, useState } from "react";
-import ReactDOM from "react-dom";
 
-const Options = () => {
-  const [color, setColor] = useState<string>("");
-  const [status, setStatus] = useState<string>("");
-  const [like, setLike] = useState<boolean>(false);
+export const Options = () => {
+  const [dateOption, setDateOption] = useState<string>();
+  const [status, setStatus] = useState<string>();
 
   useEffect(() => {
     // Restores select box and checkbox state using the preferences
     // stored in chrome.storage.
     chrome.storage.sync.get(
       {
-        favoriteColor: "red",
-        likesColor: true,
+        dateOption: "For All Time"
       },
       (items) => {
-        setColor(items.favoriteColor);
-        setLike(items.likesColor);
+        setDateOption(items.dateOption);
       }
     );
   }, []);
@@ -25,8 +21,7 @@ const Options = () => {
     // Saves options to chrome.storage.sync.
     chrome.storage.sync.set(
       {
-        favoriteColor: color,
-        likesColor: like,
+        dateOption: dateOption
       },
       () => {
         // Update status to let user know options were saved.
@@ -42,25 +37,15 @@ const Options = () => {
   return (
     <>
       <div>
-        Favorite color: <select
-          value={color}
-          onChange={(event) => setColor(event.target.value)}
+        Calculate Spending For: <select
+          value={dateOption}
+          onChange={(event) => setDateOption(event.target.value)}
         >
-          <option value="red">red</option>
-          <option value="green">green</option>
-          <option value="blue">blue</option>
-          <option value="yellow">yellow</option>
+          <option value="For All Time">For All Time</option>
+          <option value="This Month">This Month</option>
+          <option value="This Year">This Year</option>
+          <option value="Custom Date Range">Custom Date Range</option>
         </select>
-      </div>
-      <div>
-        <label>
-          <input
-            type="checkbox"
-            checked={like}
-            onChange={(event) => setLike(event.target.checked)}
-          />
-          I like colors.
-        </label>
       </div>
       <div>{status}</div>
       <button onClick={saveOptions}>Save</button>
@@ -68,9 +53,3 @@ const Options = () => {
   );
 };
 
-ReactDOM.render(
-  <React.StrictMode>
-    <Options />
-  </React.StrictMode>,
-  document.getElementById("root")
-);

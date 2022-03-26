@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 import { makeApiCalls } from "./api";
+import { Options } from "./options";
 
 const Popup = () => {
   const [currentURL, setCurrentURL] = useState<string>();
@@ -8,6 +9,7 @@ const Popup = () => {
   const [isSignedIn, setIsSignedIn] = useState<boolean>(false);
   const [totalCost, setTotalCost] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isOptionsOpen, setIsOptionsOpen] = useState<boolean>(false);
 
   useEffect(() => {
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
@@ -48,6 +50,10 @@ const Popup = () => {
 
   return (
     <>
+      <div>
+        <button onClick={() => setIsOptionsOpen(!isOptionsOpen)}>{isOptionsOpen ? "Hide Option" : "Show Options"}</button>
+      </div>
+      {isOptionsOpen && <Options />}
       <p>Current URL : {currentURL}</p>
       {isZomatoHomeOpen ? (isSignedIn ? (<div>
         <h1>Zomato Home is open</h1>

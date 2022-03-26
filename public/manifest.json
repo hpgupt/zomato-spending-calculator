@@ -1,14 +1,24 @@
 {
   "manifest_version": 3,
   "name": "zomato-spending-calculator",
-  "description": "View total amount (rupees) you have spent till now while ordering from Zomato App",
+  "description": "View total amount (in rupees) you have spent till now while ordering from Zomato App",
   "version": "1.0",
-  "options_ui": {
-    "page": "options.html"
-  },
   "action": {
-    "default_icon": "icon.png",
+    "default_icon": {
+      "16": "zomato16.png",
+      "24": "zomato24.png",
+      "32": "zomato32.png",
+      "48": "zomato48.png",
+      "128": "zomato128.png"
+    },
     "default_popup": "popup.html"
+  },
+  "icons": {
+    "16": "zomato16.png",
+    "24": "zomato24.png",
+    "32": "zomato32.png",
+    "48": "zomato48.png",
+    "128": "zomato128.png"
   },
   "content_scripts": [
     {
