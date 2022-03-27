@@ -23,7 +23,10 @@ export const makeApiCalls = async (cookies: chrome.cookies.Cookie[]) => {
             headers: myHeaders,
             redirect: 'follow'
         };
+
         const results: number[] = [];
+        const stopDate = await getStopDate();
+
         for (let page = 1; ; page++) {
             const response = await fetch(`https://www.zomato.com/webroutes/user/orders?page=${page}`, requestOptions);
             const data = await response.text();
@@ -32,11 +35,30 @@ export const makeApiCalls = async (cookies: chrome.cookies.Cookie[]) => {
                 break;
             }
             let total = 0;
-            Object.keys(jsonData).forEach(key => {
-                let value = jsonData[key];
-                total += parseInt(value.totalCost.slice(1));
-            });
+            let abort = false;
+            // Object.keys(jsonData).forEach(key => {
+            //     let value = jsonData[key];
+            //     total += parseInt(value.totalCost.slice(1));
+            // });
+            for (const key in jsonData) {
+                if (stopDate.getTime() > new Date().getTime()) {
+                    total += parseInt(jsonData[key].totalCost.slice(1));
+                }
+                else {
+                    const value = jsonData[key];
+                    const orderDate = new Date(value.orderDate.split("at")[0].trim());
+                    if (orderDate.getTime() < stopDate.getTime()) {
+                        abort = true;
+                    }
+                    else {
+                        total += parseInt(value.totalCost.slice(1));
+                    }
+                }
+            }
             results.push(total);
+            if (abort) {
+                break;
+            }
         }
         return results;
     }
@@ -44,4 +66,28 @@ export const makeApiCalls = async (cookies: chrome.cookies.Cookie[]) => {
         console.log(e);
         throw new Error("Error while making api calls to zomato");
     }
+}
+
+const getStopDate = async () => {
+    let dateOption: string;
+    const items = await chrome.storage.sync.get("dateOption");
+    dateOption = items.dateOption;
+    let stopDate: Date;
+    const presentDay = new Date();
+
+    switch (dateOption) {
+        case "For All Time":
+            stopDate = new Date(presentDay.getFullYear(), presentDay.getMonth(), presentDay.getDate() + 1);
+            break;
+        case "This Month":
+            stopDate = new Date(presentDay.getFullYear(), presentDay.getMonth(), 1);
+            break;
+        case "This Year":
+            stopDate = new Date(presentDay.getFullYear(), 0, 1);
+            break;
+        default:
+            stopDate = new Date(presentDay.getFullYear(), presentDay.getMonth(), presentDay.getDate() + 1);
+    }
+
+    return stopDate;
 }

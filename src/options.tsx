@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 export const Options = () => {
   const [dateOption, setDateOption] = useState<string>();
   const [status, setStatus] = useState<string>();
-  const [monthLimit, setMonthLimit] = useState<number>(0);
 
   useEffect(() => {
     // Restores select box and checkbox state using the preferences
@@ -15,7 +14,6 @@ export const Options = () => {
       },
       (items) => {
         setDateOption(items.dateOption);
-        setMonthLimit(items.monthLimit);
       }
     );
   }, []);
@@ -24,15 +22,14 @@ export const Options = () => {
     // Saves options to chrome.storage.sync.
     chrome.storage.sync.set(
       {
-        dateOption: dateOption,
-        monthLimit: monthLimit
+        dateOption: dateOption
       },
       () => {
         // Update status to let user know options were saved.
-        setStatus("Options saved.");
+        setStatus("Options saved. Open extension again to see changes.");
         const id = setTimeout(() => {
           setStatus("");
-        }, 1000);
+        }, 3000);
         return () => clearTimeout(id);
       }
     );
@@ -49,11 +46,7 @@ export const Options = () => {
             <option value="For All Time">For All Time</option>
             <option value="This Month">This Month</option>
             <option value="This Year">This Year</option>
-            <option value="Custom Date Range">Custom Date Range</option>
           </select>
-        </div>
-        <div className="month-limit-option">
-          Set Monthly Limit: <input type="number" value={monthLimit} onChange={(event) => setMonthLimit(parseInt(event.target.value))} min="0" />
         </div>
         <div className="option-status">{status}</div>
         <button onClick={saveOptions} className="save-option">Save Options</button>
