@@ -39,6 +39,6 @@
     "cookies"
   ],
   "host_permissions": [
-    "<all_urls>"
+    "*://*.zomato.com/"
   ]
 }

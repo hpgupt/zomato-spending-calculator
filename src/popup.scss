@@ -1,0 +1,95 @@
+body {
+    background: rgb(231, 149, 149);
+    color: #000;
+    min-height: 100px;
+    min-width: 150px;
+    .popup-body {
+        .popup-header{
+            text-align: center;
+            padding: 5px;
+            text-transform: capitalize;
+            font-weight: bold;
+            font-size: 1em;
+        }
+        .option-button {
+            margin: 5px auto;
+        }
+        .option-button > button{
+            padding: 5px;
+            border: 1px solid #000;
+            border-radius: 5px;
+            font-size: 0.8em;
+            cursor: pointer;
+            &:hover{
+                background: rgb(218, 184, 184);
+                color: #000;
+            }
+        }
+        .option-body {
+            margin: 5px 5px;
+            font-size: 0.9em;
+            .date-option > select {
+                border-radius: 1px solid #000;
+                padding: 5px;
+                margin-bottom: 5px;
+            }
+            .month-limit-option > input{
+                border-radius: 1px solid #000;
+                padding: 5px;
+                margin-bottom: 5px;
+            }
+            .save-option {
+                margin: 5px auto;
+                text-align: center;
+                font-weight: bold;
+                border-radius: 1px solid #000;
+                cursor: pointer;
+            }
+        }
+        .info-body {
+            margin: 5px 5px;
+            font-size: 0.9em;
+            .webpage-info{
+                background-color: rgb(172, 177, 109);
+                color: #000;
+                padding: 5px;
+                text-align: left;
+                border-radius: 3px;
+                margin-bottom: 5px;
+            }
+            .auth-info{
+                background-color: rgb(105, 167, 185);
+                color: #000;
+                padding: 5px;
+                text-align: left;
+                border-radius: 3px;
+                margin-bottom: 5px;
+            }
+            .error{
+                background-color: rgb(248, 27, 27);
+                color: white;
+                padding: 5px;
+                text-align: left;
+                border-radius: 3px;
+                margin-bottom: 5px;
+            }
+            .amount-info{
+                background-color: rgb(113, 207, 187);
+                color: #000;
+                padding: 5px;
+                text-align: left;
+                border-radius: 3px;
+                margin-bottom: 5px;
+            }
+            .webpage-redirect{
+                background-color: rgb(214, 172, 108);
+                color: #000;
+                padding: 5px;
+                text-align: left;
+                border-radius: 3px;
+                margin-bottom: 5px;
+            }
+        }
+
+    }
+}

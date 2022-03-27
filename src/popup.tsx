@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 import { makeApiCalls } from "./api";
 import { Options } from "./options";
+import "./popup.scss";
+const spinner = require('../public/loading-buffering.gif');
 
 const Popup = () => {
   const [currentURL, setCurrentURL] = useState<string>();
@@ -10,6 +12,7 @@ const Popup = () => {
   const [totalCost, setTotalCost] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isOptionsOpen, setIsOptionsOpen] = useState<boolean>(false);
+  const [isError, setIsError] = useState<boolean>(false);
 
   useEffect(() => {
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
@@ -42,34 +45,46 @@ const Popup = () => {
   const getCookies = () => {
     chrome.cookies.getAll({ url: "https://www.zomato.com" }, async (cookies) => {
       setIsLoading(true);
-      const results = await makeApiCalls(cookies);
-      setTotalCost(results.reduce((acc: number, curr: number) => acc + curr, 0));
-      setIsLoading(false);
+      try {
+        const results = await makeApiCalls(cookies);
+        setTotalCost(results.reduce((acc: number, curr: number) => acc + curr, 0));
+        setIsLoading(false);
+        setIsError(false);
+      }
+      catch (err) {
+        setIsLoading(false);
+        setIsError(true);
+      }
     });
   }
 
   return (
     <>
-      <div>
-        <button onClick={() => setIsOptionsOpen(!isOptionsOpen)}>{isOptionsOpen ? "Hide Option" : "Show Options"}</button>
-      </div>
-      {isOptionsOpen && <Options />}
-      <p>Current URL : {currentURL}</p>
-      {isZomatoHomeOpen ? (isSignedIn ? (<div>
-        <h1>Zomato Home is open</h1>
-        <p> SignedIn</p>
-        <p>Total Amount Spent : {isLoading ? "Loading...." : totalCost}</p>
-      </div>) : (
-        <div>
-          <h1>Zomato Home is open</h1>
-          <p>Not signed in</p>
-        </div>)
-      ) : (
-        <div>
-          <h1>Zomato Home is not open</h1>
-          <p> Open www.zomato.com on your browser, then use this extension</p>
+      <div className="popup-body">
+        <div className="popup-header">
+          Zomato Spending Calculator
         </div>
-      )}
+        <div className="option-button">
+          <button onClick={() => setIsOptionsOpen(!isOptionsOpen)}>{isOptionsOpen ? "Hide Options" : "Show Options"}</button>
+        </div>
+        {isOptionsOpen && <Options />}
+        {isZomatoHomeOpen ? (isSignedIn ? (<div className="info-body">
+          <p className="webpage-info">Zomato Home is open</p>
+          <p className="auth-info"> You are currently Signed In to Zomato Website</p>
+          {isError && <p className="error">Error while fetching data</p>}
+          <p className="amount-info">Total Amount Spent : <b>{isLoading ? <><img src={String(spinner)} alt="loading..." height="20px" width="20px" /> <span>(Can take around 30s to fetch all data)</span> </> : `₹${totalCost}`}</b></p>
+        </div>) : (
+          <div className="info-body">
+            <p className="webpage-info">Zomato Home is open</p>
+            <p className="auth-info">You are not signed in , please sign in to Zomato to continue.</p>
+          </div>)
+        ) : (
+          <div className="info-body">
+            <p className="webpage-info">Zomato Homepage is not open</p>
+            <p className="webpage-redirect">Open <a href="https://www.zomato.com/" target="_blank">www.zomato.com</a> on your browser, then use this extension</p>
+          </div>
+        )}
+      </div>
     </>
   );
 };
