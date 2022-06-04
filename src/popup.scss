@@ -3,41 +3,50 @@ body {
     color: #000;
     min-height: 100px;
     min-width: 150px;
+
     .popup-body {
-        .popup-header{
+        .popup-header {
             text-align: center;
             padding: 5px;
             text-transform: capitalize;
             font-weight: bold;
             font-size: 1em;
         }
+
         .option-button {
-            margin: 5px auto;
+            margin: 5px 5px;
+            padding: 5px;
         }
-        .option-button > button{
+
+        .option-button>button {
             padding: 5px;
             border: 1px solid #000;
             border-radius: 5px;
             font-size: 0.8em;
             cursor: pointer;
-            &:hover{
+
+            &:hover {
                 background: rgb(218, 184, 184);
                 color: #000;
             }
         }
+
         .option-body {
             margin: 5px 5px;
             font-size: 0.9em;
-            .date-option > select {
+
+            .date-option>select {
                 border-radius: 1px solid #000;
                 padding: 5px;
                 margin-bottom: 5px;
             }
-            .month-limit-option > input{
+
+            .month-limit-option>input {
                 border-radius: 1px solid #000;
                 padding: 5px;
                 margin-bottom: 5px;
             }
+
             .save-option {
                 margin: 5px auto;
                 text-align: center;
@@ -46,10 +55,12 @@ body {
                 cursor: pointer;
             }
         }
+
         .info-body {
             margin: 5px 5px;
             font-size: 0.9em;
-            .webpage-info{
+
+            .webpage-info {
                 background-color: rgb(172, 177, 109);
                 color: #000;
                 padding: 5px;
@@ -57,7 +68,8 @@ body {
                 border-radius: 3px;
                 margin-bottom: 5px;
             }
-            .auth-info{
+
+            .auth-info {
                 background-color: rgb(105, 167, 185);
                 color: #000;
                 padding: 5px;
@@ -65,7 +77,8 @@ body {
                 border-radius: 3px;
                 margin-bottom: 5px;
             }
-            .error{
+
+            .error {
                 background-color: rgb(248, 27, 27);
                 color: white;
                 padding: 5px;
@@ -73,7 +86,8 @@ body {
                 border-radius: 3px;
                 margin-bottom: 5px;
             }
-            .amount-info{
+
+            .amount-info {
                 background-color: rgb(113, 207, 187);
                 color: #000;
                 padding: 5px;
@@ -81,7 +95,8 @@ body {
                 border-radius: 3px;
                 margin-bottom: 5px;
             }
-            .webpage-redirect{
+
+            .webpage-redirect {
                 background-color: rgb(214, 172, 108);
                 color: #000;
                 padding: 5px;

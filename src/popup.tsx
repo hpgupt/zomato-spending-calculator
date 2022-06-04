@@ -72,7 +72,7 @@ const Popup = () => {
           <p className="webpage-info">Zomato Home is open</p>
           <p className="auth-info"> You are currently Signed In to Zomato Website</p>
           {isError && <p className="error">Error while fetching data</p>}
-          <p className="amount-info">Total Amount Spent : <b>{isLoading ? <><img src={String(spinner)} alt="loading..." height="20px" width="20px" /> <span>(Can take around 30s to fetch all data)</span> </> : `₹${totalCost}`}</b></p>
+          <p className="amount-info">Total Amount Spent : <b>{isLoading ? <><img src={String(spinner)} alt="loading..." height="20px" width="20px" /> <span>(Fetching Data....)</span> </> : `₹${totalCost}`}</b></p>
         </div>) : (
           <div className="info-body">
             <p className="webpage-info">Zomato Home is open</p>

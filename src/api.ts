@@ -27,38 +27,59 @@ export const makeApiCalls = async (cookies: chrome.cookies.Cookie[]) => {
         const results: number[] = [];
         const stopDate = await getStopDate();
 
-        for (let page = 1; ; page++) {
-            const response = await fetch(`https://www.zomato.com/webroutes/user/orders?page=${page}`, requestOptions);
-            const data = await response.text();
-            const jsonData = JSON.parse(data).entities.ORDER;
-            if (JSON.stringify(jsonData) === JSON.stringify([])) {
+        let stop = false;
+
+        for (let index = 0; ; index++) {
+            // const response = await fetch(`https://www.zomato.com/webroutes/user/orders?page=${page}`, requestOptions);
+            if (stop) {
                 break;
             }
-            let total = 0;
-            let abort = false;
-            // Object.keys(jsonData).forEach(key => {
-            //     let value = jsonData[key];
-            //     total += parseInt(value.totalCost.slice(1));
-            // });
-            for (const key in jsonData) {
-                if (stopDate.getTime() > new Date().getTime()) {
-                    total += parseInt(jsonData[key].totalCost.slice(1));
+            const pages = []; let count = 1;
+            while (count <= 10) {
+                pages.push(index * 10 + count);
+                count++;
+            }
+
+            const batchData = await Promise.all(pages.map(async page => {
+                let total = 0;
+                const response = await fetchWrrapper(`https://www.zomato.com/webroutes/user/orders?page=${page}`, requestOptions);
+
+                if (response === "") {
+                    return [false, 0];
                 }
-                else {
-                    const value = jsonData[key];
-                    const orderDate = new Date(value.orderDate.split("at")[0].trim());
-                    if (orderDate.getTime() < stopDate.getTime()) {
-                        abort = true;
+
+                const data = JSON.parse(response)?.entities?.ORDER;
+                if (JSON.stringify(data) === JSON.stringify([])) {
+                    stop = true;
+                    return [false, total];
+                }
+
+                for (const key in data) {
+                    if (stopDate.getTime() > new Date().getTime()) {
+                        total += parseInt(data[key].totalCost.slice(1));
                     }
                     else {
-                        total += parseInt(value.totalCost.slice(1));
+                        const value = data[key];
+                        const orderDate = new Date(value.orderDate.split("at")[0].trim());
+                        if (orderDate.getTime() < stopDate.getTime()) {
+                            stop = true;
+                        }
+                        else {
+                            total += parseInt(value.totalCost.slice(1));
+                        }
                     }
                 }
-            }
-            results.push(total);
-            if (abort) {
-                break;
-            }
+
+                return [true, total];
+            }));
+
+            batchData.forEach(data => {
+                if (data[0]) {
+                    if (typeof data[1] === "number") {
+                        results.push(data[1]);
+                    }
+                }
+            });
         }
         return results;
     }
@@ -90,4 +111,12 @@ const getStopDate = async () => {
     }
 
     return stopDate;
+}
+
+const fetchWrrapper = async (url: string, options: RequestInit) => {
+    return fetch(url, options).then(response => {
+        return response.text();
+    }).catch(_ => {
+        return "";
+    });
 }

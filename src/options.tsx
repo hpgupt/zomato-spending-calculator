@@ -29,7 +29,8 @@ export const Options = () => {
         setStatus("Options saved. Open extension again to see changes.");
         const id = setTimeout(() => {
           setStatus("");
-        }, 3000);
+          window.close();
+        }, 2000);
         return () => clearTimeout(id);
       }
     );
@@ -49,7 +50,7 @@ export const Options = () => {
           </select>
         </div>
         <div className="option-status">{status}</div>
-        <button onClick={saveOptions} className="save-option">Save Options</button>
+        <button onChange={saveOptions} className="save-option">Save Options</button>
       </div>
     </>
   );
