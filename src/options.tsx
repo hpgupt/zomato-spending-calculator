@@ -50,7 +50,7 @@ export const Options = () => {
           </select>
         </div>
         <div className="option-status">{status}</div>
-        <button onChange={saveOptions} className="save-option">Save Options</button>
+        <button onClick={saveOptions} className="save-option">Save Options</button>
       </div>
     </>
   );
