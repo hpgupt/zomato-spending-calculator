@@ -23,7 +23,7 @@
   "content_scripts": [
     {
       "matches": [
-        "<all_urls>"
+        "*://*.zomato.com/*"
       ],
       "js": [
         "js/vendor.js",
@@ -39,6 +39,6 @@
     "cookies"
   ],
   "host_permissions": [
-    "*://*.zomato.com/"
+    "*://*.zomato.com/*"
   ]
 }

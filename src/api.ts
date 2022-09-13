@@ -34,6 +34,9 @@ export const makeApiCalls = async (cookies: chrome.cookies.Cookie[]) => {
             if (stop) {
                 break;
             }
+            if (index > 1000) {
+                break;
+            }
             const pages = []; let count = 1;
             while (count <= 10) {
                 pages.push(index * 10 + count);
@@ -56,7 +59,7 @@ export const makeApiCalls = async (cookies: chrome.cookies.Cookie[]) => {
 
                 for (const key in data) {
                     if (stopDate.getTime() > new Date().getTime()) {
-                        total += parseInt(data[key].totalCost.slice(1));
+                        total += parseInt(data[key].totalCost.replace(/[^\x00-\x7F]/g, ""));
                     }
                     else {
                         const value = data[key];
@@ -65,7 +68,7 @@ export const makeApiCalls = async (cookies: chrome.cookies.Cookie[]) => {
                             stop = true;
                         }
                         else {
-                            total += parseInt(value.totalCost.slice(1));
+                            total += parseInt(value.totalCost.replace(/[^\x00-\x7F]/g, ""));
                         }
                     }
                 }
