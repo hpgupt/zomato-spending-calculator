@@ -1,6 +1,6 @@
 {
   "name": "zomato-spending-calculator",
-  "version": "1.1.1",
+  "version": "1.1.5",
   "description": "View total amount (rupees) you have spent till now while ordering from Zomato App",
   "main": "index.js",
   "scripts": {

@@ -1,3 +1,7 @@
+interface costStruct {
+    [key: string]: number
+}
+
 export const makeApiCalls = async (cookies: chrome.cookies.Cookie[]) => {
     try {
         const cookieMap: { [name: string]: string } = {};
@@ -24,7 +28,7 @@ export const makeApiCalls = async (cookies: chrome.cookies.Cookie[]) => {
             redirect: 'follow'
         };
 
-        const results: number[] = [];
+        const results: costStruct = {};
         const stopDate = await getStopDate();
 
         let stop = false;
@@ -43,12 +47,12 @@ export const makeApiCalls = async (cookies: chrome.cookies.Cookie[]) => {
                 count++;
             }
 
-            const batchData = await Promise.all(pages.map(async page => {
-                let total = 0;
+            const batchData = await Promise.all(pages.map(async (page): Promise<[boolean,costStruct]>=> {
+                let total: costStruct = {};
                 const response = await fetchWrrapper(`https://www.zomato.com/webroutes/user/orders?page=${page}`, requestOptions);
 
                 if (response === "") {
-                    return [false, 0];
+                    return [false, {}];
                 }
 
                 const data = JSON.parse(response)?.entities?.ORDER;
@@ -59,7 +63,10 @@ export const makeApiCalls = async (cookies: chrome.cookies.Cookie[]) => {
 
                 for (const key in data) {
                     if (stopDate.getTime() > new Date().getTime()) {
-                        total += parseInt(data[key].totalCost.replace(/[^\x00-\x7F]/g, ""));
+                        if (data[key].paymentStatus) {
+                            const [currency, amount] = separateCurrencyFromCost(data[key].totalCost);
+                            total[currency] = (total[currency] || 0) + parseFloat(amount);
+                        }
                     }
                     else {
                         const value = data[key];
@@ -68,7 +75,10 @@ export const makeApiCalls = async (cookies: chrome.cookies.Cookie[]) => {
                             stop = true;
                         }
                         else {
-                            total += parseInt(value.totalCost.replace(/[^\x00-\x7F]/g, ""));
+                            if (data[key].paymentStatus) {
+                                const [currency, amount] = separateCurrencyFromCost(data[key].totalCost);
+                                total[currency] = (total[currency] || 0) + parseFloat(amount);
+                            }
                         }
                     }
                 }
@@ -77,9 +87,10 @@ export const makeApiCalls = async (cookies: chrome.cookies.Cookie[]) => {
             }));
 
             batchData.forEach(data => {
-                if (data[0]) {
-                    if (typeof data[1] === "number") {
-                        results.push(data[1]);
+                const [status, total] = data;
+                if (status) {
+                    for (const key in total) {
+                        results[key] = (results[key] || 0) + total[key];
                     }
                 }
             });
@@ -123,3 +134,10 @@ const fetchWrrapper = async (url: string, options: RequestInit) => {
         return "";
     });
 }
+
+const separateCurrencyFromCost = (cost: string) => {
+    const firstDigitIndex = cost.search(/\d/);
+    const currency = cost.substring(0, firstDigitIndex).trim();
+    const amount = cost.substring(firstDigitIndex).trim();
+    return [currency, amount];
+};
